@@ -10,3 +10,7 @@ add_executable(
 	server.cpp
 )
 
+add_executable(
+	client
+	client.cpp
+)
