@@ -1,1 +1,1 @@
-/usr/bin/c++     CMakeFiles/server.dir/server.cpp.o  -o server 
+/usr/bin/c++   -std=c++14 -g   CMakeFiles/server.dir/server.cpp.o  -o server 
