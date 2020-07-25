@@ -1,0 +1,3 @@
+/home/ates/Desktop/udp-image-transer/CMakeFiles/rebuild_cache.dir
+/home/ates/Desktop/udp-image-transer/CMakeFiles/server.dir
+/home/ates/Desktop/udp-image-transer/CMakeFiles/edit_cache.dir
