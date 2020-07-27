@@ -7,6 +7,14 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <time.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb/stb_image_write.h"
 
 #define IP_PROTOCOL 0
 #define IP_ADDRESS "127.0.0.1" // localhost
@@ -67,26 +75,54 @@ int main()
         printf("\nfile descriptor %d received\n", sockfd);
 
     while (1) {
-        printf("\nPlease enter file name to receive:\n");
+        printf("\nPlease enter name of the image to sent the server:\n");
         scanf("%s", net_buf);
+
+        /*
         sendto(sockfd, net_buf, NET_BUF_SIZE,
                sendrecvflag, (struct sockaddr*)&addr_con,
-               addrlen);
+               addrlen);*/
+
+
 
         printf("\n---------Data Received---------\n");
 
-        while (1) {
-            // receive
-            clearBuf(net_buf);
-            nBytes = recvfrom(sockfd, net_buf, NET_BUF_SIZE,
-                              sendrecvflag, (struct sockaddr*)&addr_con,
-                              (socklen_t*)&addrlen);
+        int width,height,channels;
+        unsigned char *img = stbi_load(net_buf, &width, &height, &channels, 0);
 
-            // process
-            if (recvFile(net_buf, NET_BUF_SIZE)) {
-                break;
-            }
+        if(img == NULL) {
+
+            printf("Error in loading the image \n");
+            exit(1);
         }
+
+        printf("Loaded image with a width of %dpx, a height of %dpx and %d channels\n", width, height, channels);
+
+        sendto(sockfd, img, NET_BUF_SIZE,
+                   sendrecvflag,
+                (struct sockaddr*)&addr_con, addrlen);
+                /*
+
+        sleep(100);
+
+        sendto(sockfd, &width, NET_BUF_SIZE,
+                   sendrecvflag,
+                (struct sockaddr*)&addr_con, addrlen);
+
+        sleep(100);
+
+        sendto(sockfd, &height, NET_BUF_SIZE,
+                   sendrecvflag,
+                (struct sockaddr*)&addr_con, addrlen);
+
+        sleep(100);
+
+        sendto(sockfd, &channels, NET_BUF_SIZE,
+                   sendrecvflag,
+                (struct sockaddr*)&addr_con, addrlen);
+
+*/
+
         printf("\n-------------------------------\n");
     }
     return 0;

@@ -8,6 +8,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb/stb_image_write.h"
+
 #define IP_PROTOCOL 0
 #define PORT_NO 15050
 #define NET_BUF_SIZE 32
@@ -63,6 +70,7 @@ int main()
     addr_con.sin_port = htons(PORT_NO);
     addr_con.sin_addr.s_addr = INADDR_ANY;
     char net_buf[NET_BUF_SIZE];
+    int width,height,channels;
     FILE* fp;
 
     // socket()
@@ -80,40 +88,33 @@ int main()
         printf("\nBinding Failed!\n");
 
     while (1) {
-        printf("\nWaiting for file name...\n");
+        printf("\nWaiting for image...\n");
 
-        // receive file name
+        // receive image
         clearBuf(net_buf);
 
         nBytes = recvfrom(sockfd, net_buf,
                           NET_BUF_SIZE, sendrecvflag,
                           (struct sockaddr*)&addr_con, (socklen_t*)&addrlen);
 
-        fp = fopen(net_buf, "r");
-        printf("\nFile Name Received: %s\n", net_buf);
-        if (fp == NULL)
-            printf("\nFile open failed!\n");
-        else
-            printf("\nFile Successfully opened!\n");
+        /*
+        nBytes = recvfrom(sockfd, &width,
+                          NET_BUF_SIZE, sendrecvflag,
+                          (struct sockaddr*)&addr_con, (socklen_t*)&addrlen);
+        nBytes = recvfrom(sockfd, &height,
+                          NET_BUF_SIZE, sendrecvflag,
+                          (struct sockaddr*)&addr_con, (socklen_t*)&addrlen);
+        nBytes = recvfrom(sockfd, &channels,
+                          NET_BUF_SIZE, sendrecvflag,
+                          (struct sockaddr*)&addr_con, (socklen_t*)&addrlen);*/
 
-        while (1) {
 
-            // process
-            if (sendFile(fp, net_buf, NET_BUF_SIZE)) {
-                sendto(sockfd, net_buf, NET_BUF_SIZE,
-                       sendrecvflag,
-                    (struct sockaddr*)&addr_con, addrlen);
-                break;
-            }
 
-            // send
-            sendto(sockfd, net_buf, NET_BUF_SIZE,
-                   sendrecvflag,
-                (struct sockaddr*)&addr_con, addrlen);
-            clearBuf(net_buf);
-        }
-        if (fp != NULL)
-            fclose(fp);
+
+        stbi_write_jpg("received.jpg", 1000, 1250, 3, net_buf, 100);
+        stbi_image_free(net_buf);
+
+
     }
     return 0;
 }
